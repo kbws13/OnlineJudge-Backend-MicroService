@@ -46,6 +46,7 @@ server:
     session:
       cookie:
         max-age: 2592000
+        path: /api
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
@@ -58,3 +59,5 @@ mybatis-plus:
 # \u4EE3\u7801\u6C99\u7BB1\u914D\u7F6E
 codesandbox:
   type: remote
+knife4j:
+  enable: true

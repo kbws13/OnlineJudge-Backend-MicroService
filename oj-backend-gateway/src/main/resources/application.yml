@@ -8,19 +8,31 @@ spring:
         - id: oj-backend-user-service
           uri: lb://oj-backend-user-service
           predicates:
-            - PATH=/api/user/**
+            - Path=/api/user/**
         - id: oj-backend-question-service
           uri: lb://oj-backend-question-service
           predicates:
-            - PATH=/api/question/**
+            - Path=/api/question/**
         - id: oj-backend-judge-service
           uri: lb://oj-backend-judge-service
           predicates:
-            - PATH=/api/judge/**
+            - Path=/api/judge/**
   application:
     name: oj-backend-gateway
   main:
     web-application-type: reactive
 
 server:
-  port: 8181
+  port: 8101
+
+knife4j:
+  gateway:
+    # ① 第一个配置，开启gateway聚合组件
+    enabled: true
+    # ② 第二行配置，设置聚合模式采用discover服务发现的模式
+    strategy: discover
+    discover:
+      # ③ 第三行配置，开启discover模式
+      enabled: true
+      # ④ 第四行配置，聚合子服务全部为Swagger2规范的文档
+      version: swagger2
