@@ -33,6 +33,10 @@ spring:
     multipart:
       # \u5927\u5C0F\u9650\u5236
       max-file-size: 10MB
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
 server:
   address: 0.0.0.0
   port: 8104

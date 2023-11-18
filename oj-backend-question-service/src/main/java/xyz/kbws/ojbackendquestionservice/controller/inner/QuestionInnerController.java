@@ -1,9 +1,6 @@
 package xyz.kbws.ojbackendquestionservice.controller.inner;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import xyz.kbws.ojbackendmodel.model.entity.Question;
 import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 import xyz.kbws.ojbackendquestionservice.service.QuestionService;
@@ -17,6 +14,8 @@ import javax.annotation.Resource;
  * @date 2023/11/18
  * @description:
  */
+@RestController
+@RequestMapping("/inner")
 public class QuestionInnerController implements QuestionFeignClient {
 
     @Resource

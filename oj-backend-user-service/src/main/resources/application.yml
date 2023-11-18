@@ -1,7 +1,7 @@
 # \u516C\u5171\u914D\u7F6E\u6587\u4EF6
 spring:
   application:
-    name: oj-backend-question-service
+    name: oj-backend-user-service
   # \u9ED8\u8BA4 dev \u73AF\u5883
   profiles:
     active: dev
@@ -27,15 +27,19 @@ spring:
     host: localhost
     port: 6379
     timeout: 5000
-#      password: 123456
-  # \u6587\u4EF6\u4E0A\u4F20
+
   servlet:
     multipart:
       # \u5927\u5C0F\u9650\u5236
       max-file-size: 10MB
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
 server:
   address: 0.0.0.0
-  port: 8103
+  port: 8102
   servlet:
     context-path: /api/user
     # cookie 30 \u5929\u8FC7\u671F
