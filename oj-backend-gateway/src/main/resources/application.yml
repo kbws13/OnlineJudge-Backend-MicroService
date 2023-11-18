@@ -1,0 +1,26 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        - id: oj-backend-user-service
+          uri: lb://oj-backend-user-service
+          predicates:
+            - PATH=/api/user/**
+        - id: oj-backend-question-service
+          uri: lb://oj-backend-question-service
+          predicates:
+            - PATH=/api/question/**
+        - id: oj-backend-judge-service
+          uri: lb://oj-backend-judge-service
+          predicates:
+            - PATH=/api/judge/**
+  application:
+    name: oj-backend-gateway
+  main:
+    web-application-type: reactive
+
+server:
+  port: 8181
