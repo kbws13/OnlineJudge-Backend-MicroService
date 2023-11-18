@@ -24,7 +24,11 @@
 			<artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
 			<version>4.3.0</version>
 		</dependency>
-
+		<!--RabbitMQ-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>xyz.kbws</groupId>
 			<artifactId>oj-backend-model</artifactId>

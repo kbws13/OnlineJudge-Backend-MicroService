@@ -7,6 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import xyz.kbws.ojbackendjudgeservice.rabbitmq.InitRabbitMq;
 
 @SpringBootApplication
 @EnableScheduling
@@ -17,6 +18,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class OjBackendJudgeServiceApplication {
 
 	public static void main(String[] args) {
+		// 初始化消息队列
+		InitRabbitMq.doInit();
 		SpringApplication.run(OjBackendJudgeServiceApplication.class, args);
 	}
 
