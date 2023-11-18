@@ -37,7 +37,7 @@ server:
   address: 0.0.0.0
   port: 8103
   servlet:
-    context-path: /api
+    context-path: /api/user
     # cookie 30 \u5929\u8FC7\u671F
     session:
       cookie:

@@ -1,7 +1,7 @@
 # \u516C\u5171\u914D\u7F6E\u6587\u4EF6
 spring:
   application:
-    name: oj-backend-user-service
+    name: oj-backend-question-service
   # \u9ED8\u8BA4 dev \u73AF\u5883
   profiles:
     active: dev
@@ -9,7 +9,7 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  # session \u914D\u7F6E
+  # session 过期时间
   session:
     # todo \u53D6\u6D88\u6CE8\u91CA\u5F00\u542F\u5206\u5E03\u5F0F session\uFF08\u987B\u5148\u914D\u7F6E Redis\uFF09
     # store-type: redis
@@ -37,7 +37,7 @@ server:
   address: 0.0.0.0
   port: 8102
   servlet:
-    context-path: /api
+    context-path: /api/question
     # cookie 30 \u5929\u8FC7\u671F
     session:
       cookie:

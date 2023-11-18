@@ -29,7 +29,7 @@ import java.util.List;
  * 用户接口
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/")
 @Slf4j
 public class UserController {
 
