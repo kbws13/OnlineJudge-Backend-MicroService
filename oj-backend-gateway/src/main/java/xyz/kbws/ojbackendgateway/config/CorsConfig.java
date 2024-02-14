@@ -15,13 +15,16 @@ public class CorsConfig {
 
     @Bean
     public CorsWebFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new PathPatternParser());
         CorsConfiguration config = new CorsConfiguration();
+
+        // 配置跨域
         config.addAllowedMethod("*");
         config.setAllowCredentials(true);
         // todo 实际改为线上真实域名、本地域名
         config.setAllowedOriginPatterns(Arrays.asList("*"));
         config.addAllowedHeader("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new PathPatternParser());
+
         source.registerCorsConfiguration("/**", config);
         return new CorsWebFilter(source);
     }
