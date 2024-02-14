@@ -36,3 +36,6 @@ knife4j:
       enabled: true
       # ④ 第四行配置，聚合子服务全部为Swagger2规范的文档
       version: swagger2
+# 这个配置是不用看token是否合法 直接通过
+gateway:
+  excludedUrls: /api/user/get/login,/api/user/logout,/user/register,/api/user/update/my,/api/user/login,/user/getLoginUser,/api/user/register,/api/question/list/page/vo,/api/file
