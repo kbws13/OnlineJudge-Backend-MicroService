@@ -1,4 +1,4 @@
-package xyz.kbws.ojbackendjudgeservice.judge;
+package xyz.kbws.ojbackendjudgeservice.judge.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import xyz.kbws.ojbackendcommon.common.ErrorCode;
 import xyz.kbws.ojbackendcommon.exception.BusinessException;
+import xyz.kbws.ojbackendjudgeservice.judge.JudgeManager;
 import xyz.kbws.ojbackendjudgeservice.judge.codesandbox.CodeSandBox;
 import xyz.kbws.ojbackendjudgeservice.judge.codesandbox.CodeSandBoxFactory;
 import xyz.kbws.ojbackendjudgeservice.judge.codesandbox.CodeSandBoxProxy;
+import xyz.kbws.ojbackendjudgeservice.judge.service.JudgeService;
 import xyz.kbws.ojbackendjudgeservice.judge.strategy.JudgeContext;
 import xyz.kbws.ojbackendmodel.model.codesandbox.ExecuteCodeRequest;
 import xyz.kbws.ojbackendmodel.model.codesandbox.ExecuteCodeResponse;

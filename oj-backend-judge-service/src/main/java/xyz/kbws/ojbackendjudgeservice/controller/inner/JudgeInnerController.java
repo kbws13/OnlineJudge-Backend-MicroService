@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import xyz.kbws.ojbackendjudgeservice.judge.JudgeService;
+import xyz.kbws.ojbackendjudgeservice.judge.service.JudgeService;
 import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 import xyz.kbws.ojbackendserviceclient.service.JudgeFeignClient;
 

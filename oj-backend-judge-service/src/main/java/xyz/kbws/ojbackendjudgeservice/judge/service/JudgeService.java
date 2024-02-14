@@ -1,4 +1,4 @@
-package xyz.kbws.ojbackendjudgeservice.judge;
+package xyz.kbws.ojbackendjudgeservice.judge.service;
 
 
 import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
