@@ -102,7 +102,6 @@ public class JudgeServiceImpl implements JudgeService {
         if (!update) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
         }
-        QuestionSubmit questionSubmitResult = questionFeignClient.getQuestionSubmitById(questionId);
-        return questionSubmitResult;
+        return questionFeignClient.getQuestionSubmitById(questionId);
     }
 }
