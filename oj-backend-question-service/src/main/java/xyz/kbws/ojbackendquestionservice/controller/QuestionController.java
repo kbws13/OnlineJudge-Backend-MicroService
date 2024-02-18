@@ -2,6 +2,7 @@ package xyz.kbws.ojbackendquestionservice.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 import xyz.kbws.ojbackendmodel.model.entity.User;
 import xyz.kbws.ojbackendmodel.model.vo.QuestionSubmitVO;
 import xyz.kbws.ojbackendmodel.model.vo.QuestionVO;
+import xyz.kbws.ojbackendquestionservice.manage.RedissonLimiter;
 import xyz.kbws.ojbackendquestionservice.service.QuestionService;
 import xyz.kbws.ojbackendquestionservice.service.QuestionSubmitService;
 import xyz.kbws.ojbackendserviceclient.service.UserFeignClient;
@@ -46,6 +48,9 @@ public class QuestionController {
     @Resource
     private QuestionSubmitService questionSubmitService;
 
+    @Resource
+    private RedissonLimiter redissonLimiter;
+
     private final static Gson GSON = new Gson();
 
     // region 增删改查
@@ -57,6 +62,7 @@ public class QuestionController {
      * @param request
      * @return
      */
+    @ApiOperation(value = "创建题目")
     @PostMapping("/add")
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request) {
         if (questionAddRequest == null) {
