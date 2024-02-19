@@ -29,6 +29,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
+		<!--redisson-->
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson</artifactId>
+			<version>3.21.3</version>
+		</dependency>
 		<dependency>
 			<groupId>xyz.kbws</groupId>
 			<artifactId>oj-backend-model</artifactId>
