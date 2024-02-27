@@ -9,6 +9,10 @@ spring:
           uri: lb://oj-backend-user-service
           predicates:
             - Path=/api/user/**
+        - id: oj-backend-file-service
+          uri: lb://oj-backend-file-service
+          predicates:
+            - Path=/api/file/**
         - id: oj-backend-question-service
           uri: lb://oj-backend-question-service
           predicates:
