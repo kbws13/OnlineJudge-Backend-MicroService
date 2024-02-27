@@ -14,7 +14,8 @@ public enum ErrorCode {
     SYSTEM_ERROR(50000, "系统内部异常"),
     OPERATION_ERROR(50001, "操作失败"),
     API_REQUEST_ERROR(50010, "接口调用失败"),
-    NULL_ERROR(40001, "请求数据为空");
+    NULL_ERROR(40001, "请求数据为空"),
+    TOO_MANY_REQUEST(42900, "请求过于频繁");
 
     /**
      * 状态码
