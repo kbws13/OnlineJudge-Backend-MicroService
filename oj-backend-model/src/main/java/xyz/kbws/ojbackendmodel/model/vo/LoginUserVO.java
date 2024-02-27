@@ -7,9 +7,6 @@ import java.util.Date;
 
 /**
  * 已登录用户视图（脱敏）
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
  **/
 @Data
 public class LoginUserVO implements Serializable {
@@ -18,6 +15,21 @@ public class LoginUserVO implements Serializable {
      * 用户 id
      */
     private Long id;
+
+    /**
+     * 用户账号
+     */
+    private String userAccount;
+
+    /**
+     * 用户密码
+     */
+    private String userPassword;
+
+    /**
+     * token
+     */
+    private String token;
 
     /**
      * 用户昵称
@@ -33,6 +45,27 @@ public class LoginUserVO implements Serializable {
      * 用户简介
      */
     private String userProfile;
+
+    /**
+     * 性别 男 女
+     */
+    private String gender;
+
+    /**
+     * 电话
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 状态:正常/注销/封号
+     */
+    private String userState;
+
 
     /**
      * 用户角色：user/admin/ban
