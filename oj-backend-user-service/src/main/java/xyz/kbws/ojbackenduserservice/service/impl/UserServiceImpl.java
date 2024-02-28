@@ -143,7 +143,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         LoginUserVO loginUserVO = this.getLoginUserVO(user);
         // 5、构造返回值
         loginUserVO.setToken(token);
-        return this.getLoginUserVO(user);
+        return loginUserVO;
     }
 
 
