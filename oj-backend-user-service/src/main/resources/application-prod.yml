@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/oj
+    username: root
+    password: 123456
+  redis:
+    database: 1
+    host: redis
+    port: 6379
+    timeout: 5000
+  cloud:
+    nacos:
+      discovery:
+        server-addr: nacos:8848
+        username: nacos
+        password: nacos
+server:
+  address: 0.0.0.0
+  port: 8102
+  servlet:
+    context-path: /api/user
+    # cookie 30
+    session:
+      cookie:
+        max-age: 2592000
+        path: /api
+codesandbox:
+  type: remote
+knife4j:
+  enable: true
