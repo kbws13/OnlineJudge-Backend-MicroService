@@ -2,6 +2,7 @@ package xyz.kbws.ojbackenduserservice.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import xyz.kbws.ojbackendmodel.model.dto.user.UserAddRequest;
 import xyz.kbws.ojbackendmodel.model.dto.user.UserQueryRequest;
 import xyz.kbws.ojbackendmodel.model.entity.User;
 import xyz.kbws.ojbackendmodel.model.vo.LoginUserVO;
@@ -110,5 +111,12 @@ public interface UserService extends IService<User> {
      * @return
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+
+    /**
+     * 管理员添加用户
+     * @param userAddRequest
+     * @return
+     */
+    long addUser(UserAddRequest userAddRequest);
 
 }

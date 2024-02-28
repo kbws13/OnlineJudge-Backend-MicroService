@@ -1,5 +1,6 @@
 package xyz.kbws.ojbackenduserservice.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +16,11 @@ import xyz.kbws.ojbackendcommon.exception.BusinessException;
 import xyz.kbws.ojbackendcommon.exception.ThrowUtils;
 import xyz.kbws.ojbackendmodel.model.dto.user.*;
 import xyz.kbws.ojbackendmodel.model.entity.User;
+import xyz.kbws.ojbackendmodel.model.entity.UserCode;
 import xyz.kbws.ojbackendmodel.model.vo.LoginUserVO;
+import xyz.kbws.ojbackendmodel.model.vo.UserCodeVO;
 import xyz.kbws.ojbackendmodel.model.vo.UserVO;
+import xyz.kbws.ojbackenduserservice.service.UserCodeService;
 import xyz.kbws.ojbackenduserservice.service.UserService;
 
 
@@ -35,6 +39,9 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private UserCodeService userCodeService;
 
 
     // region 登录相关
@@ -126,10 +133,19 @@ public class UserController {
         if (userAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        String userAccount = userAddRequest.getUserAccount();
+        String userPassword = userAddRequest.getUserPassword();
+        String checkPassword = userAddRequest.getCheckPassword();
+        String userName = userAddRequest.getUserName();
+        String userProfile = userAddRequest.getUserProfile();
+
+        if (StringUtils.isAnyBlank(userAccount, userPassword, userName, userProfile, checkPassword)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "请求参数为空");
+        }
         User user = new User();
         BeanUtils.copyProperties(userAddRequest, user);
-        boolean result = userService.save(user);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        long result = userService.addUser(userAddRequest);
+        ThrowUtils.throwIf(result < 0, ErrorCode.OPERATION_ERROR, "新增用户失败");
         return ResultUtils.success(user.getId());
     }
 
@@ -199,8 +215,18 @@ public class UserController {
     @GetMapping("/get/vo")
     public BaseResponse<UserVO> getUserVOById(long id, HttpServletRequest request) {
         BaseResponse<User> response = getUserById(id, request);
+        QueryWrapper<UserCode> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", id);
+        UserCode userCode = userCodeService.getOne(queryWrapper);
         User user = response.getData();
-        return ResultUtils.success(userService.getUserVO(user));
+        // 脱敏，将密码设置为空
+        user.setUserPassword("");
+        UserCodeVO userCodeVO = new UserCodeVO();
+        // 将user的属性复制给userCodeVO
+        BeanUtils.copyProperties(user, userCodeVO);
+        // 将用编号添加到userCode表
+        userCodeVO.setId(userCode.getId());
+        return ResultUtils.success(userCodeVO);
     }
 
     /**
@@ -245,8 +271,6 @@ public class UserController {
         userVOPage.setRecords(userVO);
         return ResultUtils.success(userVOPage);
     }
-
-    // endregion
 
     /**
      * 更新个人信息

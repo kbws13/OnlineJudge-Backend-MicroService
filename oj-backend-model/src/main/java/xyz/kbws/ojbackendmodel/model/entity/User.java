@@ -8,9 +8,6 @@ import java.util.Date;
 
 /**
  * 用户
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @TableName(value = "user")
 @Data
@@ -33,16 +30,6 @@ public class User implements Serializable {
     private String userPassword;
 
     /**
-     * 开放平台id
-     */
-    private String unionId;
-
-    /**
-     * 公众号openId
-     */
-    private String mpOpenId;
-
-    /**
      * 用户昵称
      */
     private String userName;
@@ -56,6 +43,26 @@ public class User implements Serializable {
      * 用户简介
      */
     private String userProfile;
+
+    /**
+     * 性别 男 女
+     */
+    private String gender;
+
+    /**
+     * 电话
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 状态:正常/注销/封号
+     */
+    private String userState;
 
     /**
      * 用户角色：user/admin/ban

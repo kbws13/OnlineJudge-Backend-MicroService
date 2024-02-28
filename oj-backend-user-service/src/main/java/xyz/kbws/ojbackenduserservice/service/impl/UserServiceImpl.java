@@ -12,22 +12,31 @@ import xyz.kbws.ojbackendcommon.common.ErrorCode;
 import xyz.kbws.ojbackendcommon.constant.CommonConstant;
 import xyz.kbws.ojbackendcommon.constant.UserConstant;
 import xyz.kbws.ojbackendcommon.exception.BusinessException;
+import xyz.kbws.ojbackendcommon.utils.JwtUtils;
 import xyz.kbws.ojbackendcommon.utils.SqlUtils;
+import xyz.kbws.ojbackendmodel.model.dto.user.UserAddRequest;
 import xyz.kbws.ojbackendmodel.model.dto.user.UserQueryRequest;
 import xyz.kbws.ojbackendmodel.model.entity.User;
+import xyz.kbws.ojbackendmodel.model.entity.UserCode;
 import xyz.kbws.ojbackendmodel.model.enums.UserRoleEnum;
 import xyz.kbws.ojbackendmodel.model.vo.LoginUserVO;
 import xyz.kbws.ojbackendmodel.model.vo.UserVO;
 import xyz.kbws.ojbackenduserservice.mapper.UserMapper;
+import xyz.kbws.ojbackenduserservice.service.UserCodeService;
 import xyz.kbws.ojbackenduserservice.service.UserService;
 
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static xyz.kbws.ojbackendcommon.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 用户服务实现
@@ -39,10 +48,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
+    @Resource
+    private UserCodeService userCodeService;
+
     /**
      * 盐值，混淆密码
      */
-    private static final String SALT = "yupi";
+    private static final String SALT = "kbws";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -87,6 +99,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
             }
+
+            // 用户编号自增
+            UserCode code = new UserCode();
+            code.setUserId(user.getId());
+            userCodeService.save(code);
+
             return user.getId();
         }
     }
@@ -115,8 +133,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
-        // 3. 记录用户的登录态
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        // 3. 将登录信息保持在token中，通过JWT生成token(存入id和账号)
+        Map<String, Object> tokenMap = new HashMap<>();
+        tokenMap.put("id", user.getId());
+        tokenMap.put("userAccount", user.getUserAccount());
+        String token = JwtUtils.getToken(tokenMap);
+        // 4、 记录用户的登录态
+        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        LoginUserVO loginUserVO = this.getLoginUserVO(user);
+        // 5、构造返回值
+        loginUserVO.setToken(token);
         return this.getLoginUserVO(user);
     }
 
@@ -130,7 +156,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
@@ -153,7 +179,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User getLoginUserPermitNull(HttpServletRequest request) {
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
             return null;
@@ -172,7 +198,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean isAdmin(HttpServletRequest request) {
         // 仅管理员可查询
-        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) userObj;
         return isAdmin(user);
     }
@@ -189,11 +215,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
-        if (request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE) == null) {
+        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
-        request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
         return true;
     }
 
@@ -231,8 +257,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
         Long id = userQueryRequest.getId();
-        String unionId = userQueryRequest.getUnionId();
-        String mpOpenId = userQueryRequest.getMpOpenId();
+        String userAccount = userQueryRequest.getUserAccount();
+        String gender = userQueryRequest.getGender();
+        String phone = userQueryRequest.getPhone();
+        String email = userQueryRequest.getEmail();
+        String userStatus = userQueryRequest.getUserState();
         String userName = userQueryRequest.getUserName();
         String userProfile = userQueryRequest.getUserProfile();
         String userRole = userQueryRequest.getUserRole();
@@ -240,13 +269,88 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String sortOrder = userQueryRequest.getSortOrder();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(id != null, "id", id);
-        queryWrapper.eq(StringUtils.isNotBlank(unionId), "unionId", unionId);
-        queryWrapper.eq(StringUtils.isNotBlank(mpOpenId), "mpOpenId", mpOpenId);
         queryWrapper.eq(StringUtils.isNotBlank(userRole), "userRole", userRole);
-        queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);
+        queryWrapper.like(StringUtils.isNotBlank(userAccount), "userAccount", userAccount);
+        queryWrapper.eq(StringUtils.isNotBlank(gender), "gender", gender);
+        queryWrapper.eq(StringUtils.isNotBlank(phone), "phone", phone);
+        queryWrapper.eq(StringUtils.isNotBlank(email), "email", email);
+        queryWrapper.eq(StringUtils.isNotBlank(userStatus), "userStatus", userStatus);
         queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName);
+        queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
+    }
+
+    /**
+     * 添加用户
+     *
+     * @param userAddRequest
+     * @return
+     */
+    @Override
+    public long addUser(UserAddRequest userAddRequest) {
+        String userAccount = userAddRequest.getUserAccount();
+        String userPassword = userAddRequest.getUserPassword();
+        String checkPassword = userAddRequest.getCheckPassword();
+        String userName = userAddRequest.getUserName();
+        String userProfile = userAddRequest.getUserProfile();
+        String userAvatar = userAddRequest.getUserAvatar();
+        String phone = userAddRequest.getPhone();
+        String email = userAddRequest.getEmail();
+
+        // 校验 不能为空
+        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword, userName, userProfile)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        if (userAccount.length() < 4) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
+        }
+        if (userPassword.length() < 8 || checkPassword.length() < 8) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
+        }
+        // 密码和校验密码相同
+        if (!userPassword.equals(checkPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
+        }
+        // 账户不包含特殊字符
+        String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        // 使用正则表达式进行校验
+        Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
+        if (matcher.find()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号含有特殊字符");
+        }
+        synchronized (userAccount.intern()) {
+            // 账户不能重复
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("userAccount", userAccount);
+            long count = this.baseMapper.selectCount(queryWrapper);
+            if (count > 0) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
+            }
+
+            // 2. 加密
+            String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+            // 3. 插入数据
+            User user = new User();
+            user.setUserName(userName);
+            user.setUserAvatar(userAvatar);
+            user.setUserProfile(userProfile);
+            user.setPhone(phone);
+            user.setEmail(email);
+            user.setUserAccount(userAccount);
+            user.setUserPassword(encryptPassword);
+            boolean saveResult = this.save(user);
+            if (!saveResult) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "新增失败，数据库错误");
+            }
+
+            // 用户编号自增
+            UserCode code = new UserCode();
+            code.setUserId(user.getId());
+            userCodeService.save(code);
+
+            return user.getId();
+        }
     }
 }
