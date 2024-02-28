@@ -54,7 +54,7 @@ public class MyMessageFailConsumer {
         // 把提交题目标为失败
         questionSubmit.setStatus(QuestionSubmitStatusEnum.FAILED.getValue());
 
-        boolean update = questionFeignClient.updateQuestionSubmitById(questionSubmit);
+        boolean update = questionFeignClient.updateQuestionSubmit(questionSubmit);
         if (!update) {
             log.info("处理死信队列消息失败,对应提交的题目id为:{}", questionSubmit.getId());
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "处理死信队列消息失败");

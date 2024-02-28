@@ -21,10 +21,7 @@ public class InitRabbitMq {
     public static void doInit(){
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            // todo 配服务MQ信息
-            factory.setHost("xxxxxxx");
-            factory.setPassword("xxxx");
-            factory.setUsername("xxxx");
+            factory.setHost("localhost");
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
             String codeExchangeName = CODE_EXCHANGE_NAME;
@@ -48,7 +45,7 @@ public class InitRabbitMq {
             channel.queueBind(CODE_DLX_QUEUE, CODE_DLX_EXCHANGE, CODE_DLX_ROUTING_KEY);
             log.info("消息队列启动成功");
         }catch (Exception e){
-            log.error("消息队列启动失败");
+            log.error("消息队列启动失败",e);
         }
     }
 
