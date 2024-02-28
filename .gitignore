@@ -2,6 +2,10 @@
 .idea
 HELP.md
 target/
+.nacos-data
+.rabbitmq-data
+.redis-data
+mysql-data
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
