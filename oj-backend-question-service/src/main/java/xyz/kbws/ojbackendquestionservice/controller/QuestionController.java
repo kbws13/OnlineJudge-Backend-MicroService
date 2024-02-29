@@ -319,6 +319,19 @@ public class QuestionController {
         if (!rateLimit) {
             return ResultUtils.error(ErrorCode.TOO_MANY_REQUEST, "提交过于频繁,请稍后重试");
         }
+        // 更新提交数
+        Question question = questionService.getById(questionSubmitAddRequest.getQuestionId());
+        Integer submitNum = question.getSubmitNum();
+        Question updateQuestion = new Question();
+        synchronized (question.getSubmitNum()) {
+            submitNum = submitNum + 1;
+            updateQuestion.setId(question.getId());
+            updateQuestion.setSubmitNum(submitNum);
+            boolean save = questionService.updateById(updateQuestion);
+            if (!save) {
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "更新数据失败");
+            }
+        }
         long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
         return ResultUtils.success(questionSubmitId);
     }
