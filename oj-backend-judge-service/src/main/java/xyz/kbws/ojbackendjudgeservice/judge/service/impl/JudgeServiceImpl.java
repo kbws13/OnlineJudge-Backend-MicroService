@@ -56,13 +56,13 @@ public class JudgeServiceImpl implements JudgeService {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "题目不存在");
         }
         // 2）如果题目提交状态不为等待中，就不用重复执行了
-        if (!questionSubmit.getStatus().equals(QuestionSubmitStatusEnum.WAITING.getValue())) {
+        if (!questionSubmit.getSubmitState().equals(QuestionSubmitStatusEnum.WAITING.getValue())) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "题目正在判题中");
         }
         // 3）更改判题（题目提交）的状态为 “判题中”，防止重复执行
         QuestionSubmit questionSubmitUpdate = new QuestionSubmit();
         questionSubmitUpdate.setId(questionSubmitId);
-        questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.RUNNING.getValue());
+        questionSubmitUpdate.setSubmitState(QuestionSubmitStatusEnum.RUNNING.getValue());
         boolean update = questionFeignClient.updateQuestionSubmit(questionSubmitUpdate);
         if (!update) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
@@ -70,8 +70,8 @@ public class JudgeServiceImpl implements JudgeService {
         // 4）调用沙箱，获取到执行结果
         CodeSandBox codeSandbox = CodeSandBoxFactory.newInstance(type);
         codeSandbox = new CodeSandBoxProxy(codeSandbox);
-        String language = questionSubmit.getLanguage();
-        String code = questionSubmit.getCode();
+        String language = questionSubmit.getSubmitLanguage();
+        String code = questionSubmit.getSubmitCode();
         // 获取输入用例
         String judgeCaseStr = question.getJudgeCase();
         List<JudgeCase> judgeCaseList = JSONUtil.toList(judgeCaseStr, JudgeCase.class);
@@ -96,7 +96,7 @@ public class JudgeServiceImpl implements JudgeService {
         // 6）修改数据库中的判题结果
         questionSubmitUpdate = new QuestionSubmit();
         questionSubmitUpdate.setId(questionSubmitId);
-        questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
+        questionSubmitUpdate.setSubmitState(QuestionSubmitStatusEnum.SUCCEED.getValue());
         questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(judgeInfo));
         update = questionFeignClient.updateQuestionSubmit(questionSubmitUpdate);
         if (!update) {

@@ -52,7 +52,7 @@ public class MyMessageFailConsumer {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "提交的题目信息不存在");
         }
         // 把提交题目标为失败
-        questionSubmit.setStatus(QuestionSubmitStatusEnum.FAILED.getValue());
+        questionSubmit.setSubmitState(QuestionSubmitStatusEnum.FAILED.getValue());
 
         boolean update = questionFeignClient.updateQuestionSubmit(questionSubmit);
         if (!update) {

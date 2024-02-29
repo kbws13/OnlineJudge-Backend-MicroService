@@ -39,12 +39,12 @@ public class QuestionSubmitVO implements Serializable {
     /**
      * 编程语言
      */
-    private String language;
+    private String submitLanguage;
 
     /**
      * 用户代码
      */
-    private String code;
+    private String submitCode;
 
     /**
      * 判题信息
@@ -54,7 +54,7 @@ public class QuestionSubmitVO implements Serializable {
     /**
      * 判题状态(0 - 待判题，1 - 判题中，2 - 成功，3 - 失败)
      */
-    private Integer status;
+    private Integer submitState;
 
     /**
      * 创建时间

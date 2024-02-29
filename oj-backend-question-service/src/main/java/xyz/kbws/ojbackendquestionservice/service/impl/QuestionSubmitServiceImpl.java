@@ -32,6 +32,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static xyz.kbws.ojbackendcommon.constant.MqConstant.CODE_EXCHANGE_NAME;
+import static xyz.kbws.ojbackendcommon.constant.MqConstant.CODE_ROUTING_KEY;
+
 /**
  * @author hsy
  * @description 针对表【question_submit(题目提交)】的数据库操作Service实现
@@ -64,7 +67,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Override
     public long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
         // 校验编程语言是否合法
-        String language = questionSubmitAddRequest.getLanguage();
+        String language = questionSubmitAddRequest.getSubmitLanguage();
         QuestionSubmitLanguageEnum languageEnum = QuestionSubmitLanguageEnum.getEnumByValue(language);
         if (languageEnum == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "编程语言错误");
@@ -81,10 +84,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         QuestionSubmit questionSubmit = new QuestionSubmit();
         questionSubmit.setUserId(userId);
         questionSubmit.setQuestionId(questionId);
-        questionSubmit.setCode(questionSubmitAddRequest.getCode());
-        questionSubmit.setLanguage(language);
+        questionSubmit.setSubmitCode(questionSubmitAddRequest.getSubmitCode());
+        questionSubmit.setSubmitLanguage(language);
         // 设置初始状态
-        questionSubmit.setStatus(QuestionSubmitStatusEnum.WAITING.getValue());
+        questionSubmit.setSubmitState(QuestionSubmitStatusEnum.WAITING.getValue());
         questionSubmit.setJudgeInfo("{}");
         boolean save = this.save(questionSubmit);
         if (!save){
@@ -92,11 +95,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         }
         Long questionSubmitId = questionSubmit.getId();
         // 发送消息
-        myMessageProducer.sendMessage("code_exchange", "my_routingKey", String.valueOf(questionSubmitId));
-        // 执行判题服务
-        //CompletableFuture.runAsync(() -> {
-        //    judgeFeignClient.doJudge(questionSubmitId);
-        //});
+        myMessageProducer.sendMessage(CODE_EXCHANGE_NAME, CODE_ROUTING_KEY, String.valueOf(questionSubmitId));
         return questionSubmitId;
     }
 
@@ -113,8 +112,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         if (questionSubmitQueryRequest == null) {
             return queryWrapper;
         }
-        String language = questionSubmitQueryRequest.getLanguage();
-        Integer status = questionSubmitQueryRequest.getStatus();
+        String language = questionSubmitQueryRequest.getSubmitLanguage();
+        Integer status = questionSubmitQueryRequest.getSubmitState();
         Long questionId = questionSubmitQueryRequest.getQuestionId();
         Long userId = questionSubmitQueryRequest.getUserId();
         String sortField = questionSubmitQueryRequest.getSortField();
@@ -138,7 +137,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         long userId = loginUser.getId();
         // 处理脱敏
         if (userId != questionSubmit.getUserId() && !userFeignClient.isAdmin(loginUser)) {
-            questionSubmitVO.setCode(null);
+            questionSubmitVO.setSubmitCode(null);
         }
         return questionSubmitVO;
     }

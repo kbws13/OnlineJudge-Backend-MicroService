@@ -24,12 +24,12 @@ public class QuestionSubmitQueryRequest extends PageRequest implements Serializa
     /**
      * 提交状态
      */
-    private Integer status;
+    private Integer submitState;
 
     /**
      * 编程语言
      */
-    private String language;
+    private String submitLanguage;
 
     /**
      * 用户id
