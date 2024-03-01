@@ -8,12 +8,15 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import xyz.kbws.ojbackendcommon.utils.JwtUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +34,8 @@ public class AuthFilter implements GlobalFilter, Ordered {
     @Value("#{'${gateway.excludedUrls}'.split(',')}")
     private List<String> excludedUrls;
 
+    private AntPathMatcher antPathMatcher = new AntPathMatcher();
+
     /**
      * 过滤器核心代码
      * @param exchange
@@ -45,6 +50,14 @@ public class AuthFilter implements GlobalFilter, Ordered {
         // 如果不需要校验则放行
         if (excludedUrls.contains(path)) {
             return chain.filter(exchange);
+        }
+        // 判断路径中是否包含 inner，只允许内部调用
+        if (antPathMatcher.match("/**/inner/**", path)) {
+            ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.FORBIDDEN);
+            DataBufferFactory dataBufferFactory = response.bufferFactory();
+            DataBuffer dataBuffer = dataBufferFactory.wrap("无权限".getBytes(StandardCharsets.UTF_8));
+            return response.writeWith(Mono.just(dataBuffer));
         }
         // 2.获取 token 并校验
         String token = exchange.getRequest().getHeaders().getFirst("Authorization");
@@ -90,6 +103,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
+        return 0;
     }
 }

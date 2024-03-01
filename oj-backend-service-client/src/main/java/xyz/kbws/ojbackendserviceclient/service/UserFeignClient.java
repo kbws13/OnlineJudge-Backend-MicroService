@@ -1,11 +1,14 @@
 package xyz.kbws.ojbackendserviceclient.service;
 
+import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import xyz.kbws.ojbackendcommon.common.ErrorCode;
 import xyz.kbws.ojbackendcommon.exception.BusinessException;
+import xyz.kbws.ojbackendcommon.utils.JwtUtils;
 import xyz.kbws.ojbackendmodel.model.entity.User;
 import xyz.kbws.ojbackendmodel.model.enums.UserRoleEnum;
 import xyz.kbws.ojbackendmodel.model.vo.UserVO;
@@ -48,8 +51,14 @@ public interface UserFeignClient {
      */
     default User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
+        String token = request.getHeader("Authorization");
+        if (StringUtils.isEmpty(token)) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        Claims claims = JwtUtils.getClaims(token);
+        Long userId = (Long) claims.get("id");
+        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        User currentUser = this.getById(userId);
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }

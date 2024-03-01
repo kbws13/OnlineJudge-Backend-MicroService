@@ -1,5 +1,6 @@
 package xyz.kbws.ojbackendgateway.filter;
 
+import cn.hutool.core.util.StrUtil;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -15,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 
-@Component
 public class GlobalAuthFilter implements GlobalFilter, Ordered {
 
     private AntPathMatcher antPathMatcher = new AntPathMatcher();
@@ -33,6 +33,14 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered {
             return response.writeWith(Mono.just(dataBuffer));
         }
         // todo 统一权限校验，通过 JWT 获取登录用户信息
+        String token = exchange.getRequest().getHeaders().getFirst("Authorization");
+        if (!StrUtil.isNotBlank(token)) {
+            ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.FORBIDDEN);
+            DataBufferFactory dataBufferFactory = response.bufferFactory();
+            DataBuffer dataBuffer = dataBufferFactory.wrap("未登录".getBytes(StandardCharsets.UTF_8));
+            return response.writeWith(Mono.just(dataBuffer));
+        }
         return chain.filter(exchange);
     }
 
@@ -42,7 +50,7 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered {
      */
     @Override
     public int getOrder() {
-        return 0;
+        return Ordered.LOWEST_PRECEDENCE;
     }
 }
 

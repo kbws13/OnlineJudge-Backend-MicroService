@@ -3,6 +3,7 @@ package xyz.kbws.ojbackenduserservice.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -40,9 +41,6 @@ import static xyz.kbws.ojbackendcommon.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 用户服务实现
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @Service
 @Slf4j
@@ -139,7 +137,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         tokenMap.put("userAccount", user.getUserAccount());
         String token = JwtUtils.getToken(tokenMap);
         // 4、 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        //request.getSession().setAttribute(USER_LOGIN_STATE, user);
         LoginUserVO loginUserVO = this.getLoginUserVO(user);
         // 5、构造返回值
         loginUserVO.setToken(token);
@@ -156,15 +154,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
-        if (currentUser == null || currentUser.getId() == null) {
+        String token = request.getHeader("Authorization");
+        if (StringUtils.isEmpty(token)) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
+        Claims claims = JwtUtils.getClaims(token);
+        Long userId = (Long) claims.get("id");
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        long userId = currentUser.getId();
-        currentUser = this.getById(userId);
-        if (currentUser == null) {
+        User currentUser = this.getById(userId);
+        if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         return currentUser;
@@ -179,13 +177,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User getLoginUserPermitNull(HttpServletRequest request) {
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
+        String token = request.getHeader("Authorization");
+        if (StringUtils.isEmpty(token)) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        Claims claims = JwtUtils.getClaims(token);
+        Long userId = (Long) claims.get("id");
+        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        User currentUser = this.getById(userId);
         if (currentUser == null || currentUser.getId() == null) {
             return null;
         }
-        // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        long userId = currentUser.getId();
         return this.getById(userId);
     }
 
@@ -198,8 +200,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean isAdmin(HttpServletRequest request) {
         // 仅管理员可查询
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userObj;
+        String token = request.getHeader("Authorization");
+        Claims claims = JwtUtils.getClaims(token);
+        Long userId = (Long) claims.get("id");
+        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        User user = this.getById(userId);
         return isAdmin(user);
     }
 
@@ -219,7 +224,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
-        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        request.setAttribute("Authorization", "");
         return true;
     }
 
@@ -274,7 +279,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.eq(StringUtils.isNotBlank(gender), "gender", gender);
         queryWrapper.eq(StringUtils.isNotBlank(phone), "phone", phone);
         queryWrapper.eq(StringUtils.isNotBlank(email), "email", email);
-        queryWrapper.eq(StringUtils.isNotBlank(userStatus), "userStatus", userStatus);
+        queryWrapper.eq(StringUtils.isNotBlank(userStatus), "userState", userStatus);
         queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName);
         queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
