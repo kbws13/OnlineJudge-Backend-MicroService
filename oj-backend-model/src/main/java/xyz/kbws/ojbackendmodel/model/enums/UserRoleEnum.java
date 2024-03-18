@@ -1,5 +1,6 @@
 package xyz.kbws.ojbackendmodel.model.enums;
 
+import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.Arrays;
@@ -8,10 +9,8 @@ import java.util.stream.Collectors;
 
 /**
  * 用户角色枚举
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
+@Getter
 public enum UserRoleEnum {
 
     USER("用户", "user"),
@@ -54,11 +53,4 @@ public enum UserRoleEnum {
         return null;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public String getText() {
-        return text;
-    }
 }
