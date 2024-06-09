@@ -11,4 +11,4 @@ ADD target/oj-backend-question-service-0.0.1-SNAPSHOT.jar .
 EXPOSE 8103
 
 # 启动命令
-ENTRYPOINT ["java","-jar","/app/oj-backend-question-service-0.0.1-SNAPSHOT.jar","--spring.profiles.active=prod"]
+ENTRYPOINT ["java","-Xms512m","-Xmx1024m","-jar","/app/oj-backend-question-service-0.0.1-SNAPSHOT.jar","--spring.profiles.active=prod"]

@@ -1,25 +1,19 @@
-# \u516C\u5171\u914D\u7F6E\u6587\u4EF6
 spring:
   application:
     name: oj-backend-user-service
-  # \u9ED8\u8BA4 dev \u73AF\u5883
   profiles:
     active: dev
-  # \u652F\u6301 swagger3
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  # session \u914D\u7F6E
+  # session
   session:
-    # todo \u53D6\u6D88\u6CE8\u91CA\u5F00\u542F\u5206\u5E03\u5F0F session\uFF08\u987B\u5148\u914D\u7F6E Redis\uFF09
     # store-type: redis
-    # 30 \u5929\u8FC7\u671F
+    # 30
     timeout: 2592000
-  # \u6570\u636E\u5E93\u914D\u7F6E
-  # todo \u9700\u66FF\u6362\u914D\u7F6E
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/my_db
+    url: jdbc:mysql://localhost:3306/oj
     username: root
     password: hsy031122
   redis:
@@ -30,7 +24,6 @@ spring:
 
   servlet:
     multipart:
-      # \u5927\u5C0F\u9650\u5236
       max-file-size: 10MB
   cloud:
     nacos:
@@ -42,7 +35,7 @@ server:
   port: 8102
   servlet:
     context-path: /api/user
-    # cookie 30 \u5929\u8FC7\u671F
+    # cookie 30
     session:
       cookie:
         max-age: 2592000
@@ -53,10 +46,10 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
-      logic-delete-field: isDelete # \u5168\u5C40\u903B\u8F91\u5220\u9664\u7684\u5B9E\u4F53\u5B57\u6BB5\u540D
-      logic-delete-value: 1 # \u903B\u8F91\u5DF2\u5220\u9664\u503C\uFF08\u9ED8\u8BA4\u4E3A 1\uFF09
-      logic-not-delete-value: 0 # \u903B\u8F91\u672A\u5220\u9664\u503C\uFF08\u9ED8\u8BA4\u4E3A 0\uFF09
-# \u4EE3\u7801\u6C99\u7BB1\u914D\u7F6E
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
 codesandbox:
   type: remote
 knife4j:

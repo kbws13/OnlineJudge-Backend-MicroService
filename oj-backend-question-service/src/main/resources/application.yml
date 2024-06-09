@@ -19,7 +19,7 @@ spring:
   # todo \u9700\u66FF\u6362\u914D\u7F6E
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/my_db
+    url: jdbc:mysql://localhost:3306/oj
     username: root
     password: hsy031122
   redis:
