@@ -40,7 +40,7 @@ services:
       context: ./oj-backend-question-service
       dockerfile: Dockerfile
     ports:
-      - "8103:8103"
+      - "8105:8103"
     networks:
       - mynetwork
     depends_on:

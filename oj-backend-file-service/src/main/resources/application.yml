@@ -17,9 +17,9 @@ spring:
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/my_db
+    url: jdbc:mysql://localhost:3306/oj
     username: root
-    password: 123456
+    password: hsy031122
   # Redis 配置
   redis:
     database: 3
@@ -49,10 +49,9 @@ server:
 knife4j:
   enable: true
 # 对象存储
-# todo 需替换配置
 cos:
   client:
-    accessKey: xxx
-    secretKey: xxx
-    region: xxx
-    bucket: xxx
+    accessKey: AKIDraMe1N3ri1bHvjgXUSKKWmBgK9tm2Ng5
+    secretKey: eRKDEKb3gKBeAlZRTbgekllhf1OmWPLR
+    region: ap-chengdu
+    bucket: blog-1312417182
