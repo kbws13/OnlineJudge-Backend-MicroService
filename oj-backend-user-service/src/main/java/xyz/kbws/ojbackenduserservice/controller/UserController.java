@@ -23,10 +23,8 @@ import xyz.kbws.ojbackendmodel.model.vo.UserVO;
 import xyz.kbws.ojbackenduserservice.service.UserCodeService;
 import xyz.kbws.ojbackenduserservice.service.UserService;
 
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**

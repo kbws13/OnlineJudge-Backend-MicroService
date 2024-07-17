@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static xyz.kbws.ojbackendcommon.constant.MqConstant.*;
-import static xyz.kbws.ojbackendcommon.constant.MqConstant.CODE_DLX_ROUTING_KEY;
 
 /**
  * @author kbws
@@ -45,6 +44,11 @@ public class InitRabbitMqBean {
             codeMap.put("x-dead-letter-routing-key", CODE_DLX_ROUTING_KEY);
             channel.queueDeclare(codeQueue, true, false, false, codeMap);
             channel.queueBind(codeQueue, codeExchangeName, CODE_ROUTING_KEY);
+
+            // 创建通知队列
+            channel.exchangeDeclare(NOTICE_EXCHANGE_NAME, NOTICE_DIRECT_EXCHANGE);
+            channel.queueDeclare(NOTICE_QUEUE, true, false, false, null);
+            channel.queueBind(NOTICE_QUEUE, NOTICE_EXCHANGE_NAME, NOTICE_ROUTING_KEY);
 
             // 创建死信队列和死信交换机
             // 创建死信队列

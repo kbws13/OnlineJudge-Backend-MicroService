@@ -1,6 +1,8 @@
 package xyz.kbws.ojbackendquestionservice.controller.inner;
 
 import org.springframework.web.bind.annotation.*;
+import xyz.kbws.ojbackendcommon.utils.SseEmitterUtils;
+import xyz.kbws.ojbackendmodel.model.entity.Notice;
 import xyz.kbws.ojbackendmodel.model.entity.Question;
 import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 import xyz.kbws.ojbackendquestionservice.service.QuestionService;
@@ -46,5 +48,11 @@ public class QuestionInnerController implements QuestionFeignClient {
     @PostMapping("/question/save")
     public boolean updateQuestion(@RequestBody Question question) {
         return questionService.updateById(question);
+    }
+
+    @Override
+    @PostMapping("/question/sendMsg")
+    public void sendMsg(Notice notice) {
+        SseEmitterUtils.sendMessage(notice.getUserId(), notice.getMessage());
     }
 }

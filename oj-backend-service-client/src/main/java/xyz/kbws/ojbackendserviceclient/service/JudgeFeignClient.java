@@ -15,6 +15,7 @@ import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 public interface JudgeFeignClient {
     /**
      * 判题
+     *
      * @param questionSubmitId
      * @return
      */

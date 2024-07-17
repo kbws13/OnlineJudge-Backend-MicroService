@@ -18,7 +18,7 @@ import static xyz.kbws.ojbackendcommon.constant.MqConstant.*;
 @Slf4j
 public class InitRabbitMq {
 
-    public static void doInit(){
+    public static void doInit() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");
@@ -44,8 +44,8 @@ public class InitRabbitMq {
             channel.exchangeDeclare(CODE_DLX_EXCHANGE, CODE_DIRECT_EXCHANGE);
             channel.queueBind(CODE_DLX_QUEUE, CODE_DLX_EXCHANGE, CODE_DLX_ROUTING_KEY);
             log.info("消息队列启动成功");
-        }catch (Exception e){
-            log.error("消息队列启动失败",e);
+        } catch (Exception e) {
+            log.error("消息队列启动失败", e);
         }
     }
 

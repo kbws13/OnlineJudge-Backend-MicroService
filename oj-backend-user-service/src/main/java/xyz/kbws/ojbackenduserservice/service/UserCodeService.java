@@ -11,6 +11,7 @@ import xyz.kbws.ojbackendmodel.model.entity.UserCode;
 public interface UserCodeService extends IService<UserCode> {
     /**
      * 查看用户有无调用次数
+     *
      * @param userId
      * @return
      */

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import xyz.kbws.ojbackendcommon.common.ErrorCode;
 import xyz.kbws.ojbackendcommon.constant.CommonConstant;
-import xyz.kbws.ojbackendcommon.constant.UserConstant;
 import xyz.kbws.ojbackendcommon.exception.BusinessException;
 import xyz.kbws.ojbackendcommon.utils.JwtUtils;
 import xyz.kbws.ojbackendcommon.utils.SqlUtils;
@@ -25,7 +24,6 @@ import xyz.kbws.ojbackendmodel.model.vo.UserVO;
 import xyz.kbws.ojbackenduserservice.mapper.UserMapper;
 import xyz.kbws.ojbackenduserservice.service.UserCodeService;
 import xyz.kbws.ojbackenduserservice.service.UserService;
-
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -46,13 +44,12 @@ import static xyz.kbws.ojbackendcommon.constant.UserConstant.USER_LOGIN_STATE;
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
-    @Resource
-    private UserCodeService userCodeService;
-
     /**
      * 盐值，混淆密码
      */
     private static final String SALT = "kbws";
+    @Resource
+    private UserCodeService userCodeService;
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {

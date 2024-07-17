@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import xyz.kbws.ojbackendcommon.annotation.AuthCheck;
 import xyz.kbws.ojbackendcommon.common.BaseResponse;
 import xyz.kbws.ojbackendcommon.common.DeleteRequest;
@@ -14,6 +15,7 @@ import xyz.kbws.ojbackendcommon.common.ResultUtils;
 import xyz.kbws.ojbackendcommon.constant.UserConstant;
 import xyz.kbws.ojbackendcommon.exception.BusinessException;
 import xyz.kbws.ojbackendcommon.exception.ThrowUtils;
+import xyz.kbws.ojbackendcommon.utils.SseEmitterUtils;
 import xyz.kbws.ojbackendmodel.model.dto.question.*;
 import xyz.kbws.ojbackendmodel.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import xyz.kbws.ojbackendmodel.model.dto.questionsubmit.QuestionSubmitQueryRequest;
@@ -39,19 +41,15 @@ import java.util.List;
 @Slf4j
 public class QuestionController {
 
+    private final static Gson GSON = new Gson();
     @Resource
     private QuestionService questionService;
-
     @Resource
     private UserFeignClient userFeignClient;
-
     @Resource
     private QuestionSubmitService questionSubmitService;
-
     @Resource
     private RedissonLimiter redissonLimiter;
-
-    private final static Gson GSON = new Gson();
 
     // region 增删改查
 
@@ -353,5 +351,14 @@ public class QuestionController {
                 questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
         final User loginUser = userFeignClient.getLoginUser(request);
         return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
+    }
+
+    @GetMapping("/sse/connect/{userId}")
+    public SseEmitter connect(@PathVariable("userId") Long userId) {
+        User user = userFeignClient.getById(userId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        return SseEmitterUtils.connect(userId);
     }
 }

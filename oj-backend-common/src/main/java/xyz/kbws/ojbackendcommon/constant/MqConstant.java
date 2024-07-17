@@ -15,6 +15,14 @@ public interface MqConstant {
     String CODE_DIRECT_EXCHANGE = "direct";
 
     /**
+     * 消息交换机
+     */
+    String NOTICE_QUEUE = "notice_queue";
+    String NOTICE_EXCHANGE_NAME = "notice_exchange";
+    String NOTICE_ROUTING_KEY = "notice_routingKey";
+    String NOTICE_DIRECT_EXCHANGE = "direct";
+
+    /**
      * 死信队列交换机
      */
     String CODE_DLX_EXCHANGE = "code-dlx-exchange";

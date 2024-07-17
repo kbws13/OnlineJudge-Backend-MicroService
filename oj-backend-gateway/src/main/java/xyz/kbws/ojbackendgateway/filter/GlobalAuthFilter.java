@@ -9,7 +9,6 @@ import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -46,6 +45,7 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered {
 
     /**
      * 优先级提到最高
+     *
      * @return
      */
     @Override

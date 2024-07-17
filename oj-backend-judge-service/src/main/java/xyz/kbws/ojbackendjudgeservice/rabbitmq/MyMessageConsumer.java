@@ -1,5 +1,6 @@
 package xyz.kbws.ojbackendjudgeservice.rabbitmq;
 
+import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import xyz.kbws.ojbackendcommon.common.ErrorCode;
 import xyz.kbws.ojbackendcommon.exception.BusinessException;
 import xyz.kbws.ojbackendjudgeservice.judge.service.JudgeService;
+import xyz.kbws.ojbackendmodel.model.entity.Notice;
 import xyz.kbws.ojbackendmodel.model.entity.Question;
 import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 import xyz.kbws.ojbackendmodel.model.enums.QuestionSubmitStatusEnum;
@@ -18,6 +20,7 @@ import xyz.kbws.ojbackendserviceclient.service.QuestionFeignClient;
 import javax.annotation.Resource;
 
 import static xyz.kbws.ojbackendcommon.constant.MqConstant.CODE_QUEUE;
+import static xyz.kbws.ojbackendcommon.constant.MqConstant.NOTICE_QUEUE;
 
 /**
  * @author kbws
@@ -28,9 +31,9 @@ import static xyz.kbws.ojbackendcommon.constant.MqConstant.CODE_QUEUE;
 @Slf4j
 public class MyMessageConsumer {
 
+    private final static Gson GSON = new Gson();
     @Resource
     private JudgeService judgeService;
-
     @Resource
     private QuestionFeignClient questionFeignClient;
 
@@ -72,10 +75,17 @@ public class MyMessageConsumer {
             }
             // 手动确认消息
             channel.basicAck(deliveryTag, false);
-        }catch (Exception e){
+        } catch (Exception e) {
             // 消息为空，则拒绝消息，进入死信队列
             channel.basicNack(deliveryTag, false, false);
-            channel.basicNack(deliveryTag, false, false);
         }
+    }
+
+    @SneakyThrows
+    @RabbitListener(queues = {NOTICE_QUEUE}, concurrency = "2")
+    public void receiveNoticeMessage(String message) {
+        log.info("receiveNoticeMessage message = {}", message);
+        Notice notice = GSON.fromJson(message, Notice.class);
+        questionFeignClient.sendMsg(notice);
     }
 }

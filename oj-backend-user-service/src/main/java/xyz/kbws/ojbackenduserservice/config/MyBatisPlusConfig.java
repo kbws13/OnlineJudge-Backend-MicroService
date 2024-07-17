@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @MapperScan("xyz.kbws.ojbackenduserservice.mapper")
 public class MyBatisPlusConfig {
     /**
-     *  拦截器配置
+     * 拦截器配置
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {

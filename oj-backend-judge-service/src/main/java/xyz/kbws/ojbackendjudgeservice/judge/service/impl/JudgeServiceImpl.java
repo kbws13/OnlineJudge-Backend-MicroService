@@ -16,6 +16,7 @@ import xyz.kbws.ojbackendmodel.model.codesandbox.ExecuteCodeRequest;
 import xyz.kbws.ojbackendmodel.model.codesandbox.ExecuteCodeResponse;
 import xyz.kbws.ojbackendmodel.model.codesandbox.JudgeInfo;
 import xyz.kbws.ojbackendmodel.model.dto.question.JudgeCase;
+import xyz.kbws.ojbackendmodel.model.entity.Notice;
 import xyz.kbws.ojbackendmodel.model.entity.Question;
 import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 import xyz.kbws.ojbackendmodel.model.enums.QuestionSubmitStatusEnum;
@@ -59,6 +60,8 @@ public class JudgeServiceImpl implements JudgeService {
         if (!questionSubmit.getSubmitState().equals(QuestionSubmitStatusEnum.WAITING.getValue())) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "题目正在判题中");
         }
+        Notice notice = new Notice();
+        notice.setUserId(questionSubmit.getUserId());
         // 3）更改判题（题目提交）的状态为 “判题中”，防止重复执行
         QuestionSubmit questionSubmitUpdate = new QuestionSubmit();
         questionSubmitUpdate.setId(questionSubmitId);
@@ -67,6 +70,8 @@ public class JudgeServiceImpl implements JudgeService {
         if (!update) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
         }
+        notice.setMessage("运行中");
+        questionFeignClient.sendMsg(notice);
         // 4）调用沙箱，获取到执行结果
         CodeSandBox codeSandbox = CodeSandBoxFactory.newInstance(type);
         codeSandbox = new CodeSandBoxProxy(codeSandbox);
@@ -92,6 +97,8 @@ public class JudgeServiceImpl implements JudgeService {
         judgeContext.setQuestion(question);
         judgeContext.setQuestionSubmit(questionSubmit);
         JudgeInfo judgeInfo = judgeManager.doJudge(judgeContext);
+        notice.setMessage(judgeInfo.getMessage());
+        questionFeignClient.sendMsg(notice);
         log.error(judgeInfo.toString());
         // 6）修改数据库中的判题结果
         questionSubmitUpdate = new QuestionSubmit();

@@ -11,6 +11,7 @@ import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 public interface JudgeService {
     /**
      * 判题
+     *
      * @param questionSubmitId
      * @return
      */

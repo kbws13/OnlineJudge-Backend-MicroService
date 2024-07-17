@@ -20,65 +20,52 @@ import java.util.Date;
 public class QuestionSubmitVO implements Serializable {
 
     private final static Gson GSON = new Gson();
-
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
     /**
      * id
      */
     private Long id;
-
     /**
      * 题目 id
      */
     private Long questionId;
-
     /**
      * 提交用户 id
      */
     private Long userId;
-
     /**
      * 编程语言
      */
     private String submitLanguage;
-
     /**
      * 用户代码
      */
     private String submitCode;
-
     /**
      * 判题信息
      */
     private JudgeInfo judgeInfo;
-
     /**
      * 判题状态(0 - 待判题，1 - 判题中，2 - 成功，3 - 失败)
      */
     private Integer submitState;
-
     /**
      * 创建时间
      */
     private Date createTime;
-
     /**
      * 更新时间
      */
     private Date updateTime;
-
     /**
      * 提交用户信息
      */
     private UserVO userVO;
-
     /**
      * 对应题目信息
      */
     private QuestionVO questionVO;
-
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 
     /**
      * 包装类转对象

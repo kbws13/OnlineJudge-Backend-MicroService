@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package xyz.kbws.ojbackendmicroservice.demos.nacosdiscoveryconsumer;
+package xyz.kbws.ojbackendmicroservice.demos.nacosdiscoveryconsumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;

@@ -7,14 +7,13 @@ import xyz.kbws.ojbackendmodel.model.dto.question.QuestionQueryRequest;
 import xyz.kbws.ojbackendmodel.model.entity.Question;
 import xyz.kbws.ojbackendmodel.model.vo.QuestionVO;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
-* @author hsy
-* @description 针对表【question(题目)】的数据库操作Service
-* @createDate 2023-10-16 21:27:46
-*/
+ * @author hsy
+ * @description 针对表【question(题目)】的数据库操作Service
+ * @createDate 2023-10-16 21:27:46
+ */
 public interface QuestionService extends IService<Question> {
     /**
      * 校验

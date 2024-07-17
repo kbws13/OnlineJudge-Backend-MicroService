@@ -8,7 +8,6 @@ import xyz.kbws.ojbackendmodel.model.entity.User;
 import xyz.kbws.ojbackendmodel.model.vo.LoginUserVO;
 import xyz.kbws.ojbackendmodel.model.vo.UserVO;
 
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -111,6 +110,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 管理员添加用户
+     *
      * @param userAddRequest
      * @return
      */

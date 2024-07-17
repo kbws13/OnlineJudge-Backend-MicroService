@@ -3,10 +3,10 @@ package xyz.kbws.ojbackendquestionservice.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import xyz.kbws.ojbackendcommon.common.ErrorCode;
 import xyz.kbws.ojbackendcommon.constant.CommonConstant;
@@ -14,6 +14,7 @@ import xyz.kbws.ojbackendcommon.exception.BusinessException;
 import xyz.kbws.ojbackendcommon.utils.SqlUtils;
 import xyz.kbws.ojbackendmodel.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import xyz.kbws.ojbackendmodel.model.dto.questionsubmit.QuestionSubmitQueryRequest;
+import xyz.kbws.ojbackendmodel.model.entity.Notice;
 import xyz.kbws.ojbackendmodel.model.entity.Question;
 import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 import xyz.kbws.ojbackendmodel.model.entity.User;
@@ -24,16 +25,13 @@ import xyz.kbws.ojbackendquestionservice.mapper.QuestionSubmitMapper;
 import xyz.kbws.ojbackendquestionservice.rabbitmq.MyMessageProducer;
 import xyz.kbws.ojbackendquestionservice.service.QuestionService;
 import xyz.kbws.ojbackendquestionservice.service.QuestionSubmitService;
-import xyz.kbws.ojbackendserviceclient.service.JudgeFeignClient;
 import xyz.kbws.ojbackendserviceclient.service.UserFeignClient;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static xyz.kbws.ojbackendcommon.constant.MqConstant.CODE_EXCHANGE_NAME;
-import static xyz.kbws.ojbackendcommon.constant.MqConstant.CODE_ROUTING_KEY;
+import static xyz.kbws.ojbackendcommon.constant.MqConstant.*;
 
 /**
  * @author hsy
@@ -44,16 +42,11 @@ import static xyz.kbws.ojbackendcommon.constant.MqConstant.CODE_ROUTING_KEY;
 public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper, QuestionSubmit>
         implements QuestionSubmitService {
 
+    private final static Gson GSON = new Gson();
     @Resource
     private QuestionService questionService;
-
     @Resource
     private UserFeignClient userFeignClient;
-
-    @Resource
-    @Lazy
-    private JudgeFeignClient judgeFeignClient;
-
     @Resource
     private MyMessageProducer myMessageProducer;
 
@@ -90,12 +83,17 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         questionSubmit.setSubmitState(QuestionSubmitStatusEnum.WAITING.getValue());
         questionSubmit.setJudgeInfo("{}");
         boolean save = this.save(questionSubmit);
-        if (!save){
+        if (!save) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "数据插入失败");
         }
         Long questionSubmitId = questionSubmit.getId();
-        // 发送消息
+        // 发送消息给判题服务
         myMessageProducer.sendMessage(CODE_EXCHANGE_NAME, CODE_ROUTING_KEY, String.valueOf(questionSubmitId));
+        // 发送通知消息
+        Notice notice = new Notice();
+        notice.setUserId(userId);
+        notice.setMessage("执行中");
+        myMessageProducer.sendMessage(NOTICE_EXCHANGE_NAME, NOTICE_ROUTING_KEY, GSON.toJson(notice));
         return questionSubmitId;
     }
 

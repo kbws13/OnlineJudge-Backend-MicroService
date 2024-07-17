@@ -18,8 +18,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableFeignClients(basePackages = {"xyz.kbws.ojbackendserviceclient.service"})
 public class OjBackendUserServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OjBackendUserServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OjBackendUserServiceApplication.class, args);
+    }
 
 }

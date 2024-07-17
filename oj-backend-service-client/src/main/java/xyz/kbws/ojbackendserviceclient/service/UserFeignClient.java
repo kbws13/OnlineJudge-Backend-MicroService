@@ -17,10 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 
-import static xyz.kbws.ojbackendcommon.constant.UserConstant.USER_LOGIN_STATE;
-
 /**
  * 用户服务
+ *
  * @author kbws
  */
 @FeignClient(name = "oj-backend-user-service", path = "/api/user/inner")

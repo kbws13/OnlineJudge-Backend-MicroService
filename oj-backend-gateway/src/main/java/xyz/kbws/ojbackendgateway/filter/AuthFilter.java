@@ -38,6 +38,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     /**
      * 过滤器核心代码
+     *
      * @param exchange
      * @param chain
      * @return

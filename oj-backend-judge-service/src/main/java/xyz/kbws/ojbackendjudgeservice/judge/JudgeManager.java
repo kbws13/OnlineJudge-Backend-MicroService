@@ -19,10 +19,11 @@ import xyz.kbws.ojbackendmodel.model.entity.QuestionSubmit;
 public class JudgeManager {
     /**
      * 执行判题
+     *
      * @param judgeContext
      * @return
      */
-    public JudgeInfo doJudge(JudgeContext judgeContext){
+    public JudgeInfo doJudge(JudgeContext judgeContext) {
         QuestionSubmit questionSubmit = judgeContext.getQuestionSubmit();
         String language = questionSubmit.getSubmitLanguage();
         JudgeStrategy judgeStrategy = new DefaultJudgeStrategy();
